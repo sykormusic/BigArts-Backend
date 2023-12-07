@@ -34,8 +34,8 @@ const productImgResize = async (req, res, next) => {
         .resize(300, 300)
         .toFormat("jpeg")
         .jpeg({ quality: 90 })
-        .toFile(`tmp/${file.filename}`);
-      fs.unlinkSync(`tmp/${file.filename}`);
+        .toFile(`/tmp/${file.filename}`);
+      fs.unlinkSync(`/tmp/${file.filename}`);
     })
   );
   next();
@@ -49,8 +49,8 @@ const blogImgResize = async (req, res, next) => {
         .resize(300, 300)
         .toFormat("jpeg")
         .jpeg({ quality: 90 })
-        .toFile(`tmp/${file.filename}`);
-      fs.unlinkSync(`tmp/${file.filename}`);
+        .toFile(`/tmp/${file.filename}`);
+      fs.unlinkSync(`/tmp/${file.filename}`);
     })
   );
   next();
