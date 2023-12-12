@@ -26,6 +26,19 @@ var orderSchema = new mongoose.Schema(
         "Delivered",
       ],
     },
+    paymentAddress: {
+      address: String,
+      country: String,
+      ward: String,
+      district: String,
+      state: String,
+    },
+    paymentInfo: {
+      firstName: String,
+      lastName: String,
+      mobile: String,
+      email: String,
+    },
     orderby: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",

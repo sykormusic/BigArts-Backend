@@ -297,7 +297,7 @@ const forgotPasswordToken = asyncHandler(async (req, res) => {
   try {
     const token = await user.createPasswordResetToken();
     await user.save();
-    const resetURL = `Hi, Please follow this link to reset Your Password. This link is valid till 10 minutes from now. <a href='http://localhost:5000/api/user/reset-password/${token}'>Click Here</>`;
+    const resetURL = `Hi, Please follow this link to reset Your Password. This link is valid till 10 minutes from now. <a href='https://bigarts.vercel.app/reset-password/${token}'>Click Here</>`;
     const data = {
       to: email,
       text: "Hey User",
@@ -331,7 +331,7 @@ const getWishlist = asyncHandler(async (req, res) => {
   const { _id } = req.user;
   try {
     const findUser = await User.findById(_id).populate("wishlist");
-    res.json(findUser);
+    res.json(findUser?.wishlist);
   } catch (error) {
     throw new Error(error);
   }
@@ -423,7 +423,7 @@ const applyCoupon = asyncHandler(async (req, res) => {
 });
 
 const createOrder = asyncHandler(async (req, res) => {
-  const { COD, couponApplied } = req.body;
+  const { COD, couponApplied, paymentAddress, paymentInfo } = req.body;
   const { _id } = req.user;
   validateMongoDbId(_id);
   try {
@@ -437,7 +437,7 @@ const createOrder = asyncHandler(async (req, res) => {
       finalAmout = userCart.cartTotal;
     }
 
-    let newOrder = await new Order({
+    await new Order({
       products: userCart.products,
       paymentIntent: {
         id: uniqid(),
@@ -445,11 +445,14 @@ const createOrder = asyncHandler(async (req, res) => {
         amount: finalAmout,
         status: "Cash on Delivery",
         created: Date.now(),
-        currency: "usd",
+        currency: "vnd",
       },
       orderby: user._id,
       orderStatus: "Cash on Delivery",
+      paymentAddress,
+      paymentInfo,
     }).save();
+
     let update = userCart.products.map((item) => {
       return {
         updateOne: {
@@ -469,7 +472,7 @@ const getOrders = asyncHandler(async (req, res) => {
   const { _id } = req.user;
   validateMongoDbId(_id);
   try {
-    const userorders = await Order.findOne({ orderby: _id })
+    const userorders = await Order.find({ orderby: _id })
       .populate("products.product")
       .populate("orderby")
       .exec();
@@ -490,6 +493,18 @@ const getAllOrders = asyncHandler(async (req, res) => {
     throw new Error(error);
   }
 });
+
+const getOrderById = asyncHandler(async (req, res) => {
+  try {
+    const result = await Order.findById(req.params.id)
+      .populate("products.product")
+      .exec();
+    res.json(result);
+  } catch (error) {
+    throw new Error(error);
+  }
+});
+
 const getOrderByUserId = asyncHandler(async (req, res) => {
   const { id } = req.params;
   validateMongoDbId(id);
@@ -549,5 +564,6 @@ module.exports = {
   getOrders,
   updateOrderStatus,
   getAllOrders,
+  getOrderById,
   getOrderByUserId,
 };
