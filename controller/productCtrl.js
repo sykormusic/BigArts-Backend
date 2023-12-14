@@ -58,7 +58,7 @@ const getAllProduct = asyncHandler(async (req, res) => {
   try {
     // Filtering
     const queryObj = { ...req.query };
-    const excludeFields = ["page", "sort", "limit", "fields"];
+    const excludeFields = ["page", "sort", "limit", "fields", "searchKey"];
     excludeFields.forEach((el) => delete queryObj[el]);
     let queryStr = JSON.stringify(queryObj);
     queryStr = queryStr.replace(/\b(gte|gt|lte|lt)\b/g, (match) => `$${match}`);
@@ -66,6 +66,20 @@ const getAllProduct = asyncHandler(async (req, res) => {
     let query = Product.find(JSON.parse(queryStr));
     let queryAll = Product.find(JSON.parse(queryStr));
 
+    if (req.query.searchKey) {
+      query = query.find({
+        title: {
+          $regex: req.query.searchKey,
+          $options: "i",
+        },
+      });
+      queryAll = queryAll.find({
+        title: {
+          $regex: req.query.searchKey,
+          $options: "i",
+        },
+      });
+    }
     // Sorting
 
     if (req.query.sort) {
@@ -100,7 +114,8 @@ const getAllProduct = asyncHandler(async (req, res) => {
     query = query.skip(skip).limit(limit);
 
     if (req.query.page) {
-      if (skip >= productCount) throw new Error("This Page does not exists");
+      // const productCount = await Product.countDocuments();
+      if (skip > productCount) throw new Error("This Page does not exists");
     }
     const product = await query;
     res.json({
@@ -201,6 +216,22 @@ const rating = asyncHandler(async (req, res) => {
   }
 });
 
+const searchProducts = asyncHandler(async (req, res) => {
+  try {
+    const { searchKey } = req.query;
+    const limit = 10;
+    const products = await Product.find({
+      title: {
+        $regex: searchKey,
+        $options: "i",
+      },
+    }).limit(limit);
+    res.json(products);
+  } catch (error) {
+    throw new Error(error);
+  }
+});
+
 module.exports = {
   createProduct,
   getaProduct,
@@ -209,4 +240,5 @@ module.exports = {
   deleteProduct,
   addToWishlist,
   rating,
+  searchProducts,
 };
