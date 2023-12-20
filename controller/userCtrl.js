@@ -569,18 +569,44 @@ const updateOrderStatus = asyncHandler(async (req, res) => {
   const { status } = req.body;
   const { id } = req.params;
   validateMongoDbId(id);
+
   try {
-    const updateOrderStatus = await Order.findByIdAndUpdate(
-      id,
+    // Retrieve existing order
+    const existingOrder = await Order.findById(id);
+
+    // Ensure that the order exists
+    if (!existingOrder) {
+      return res.status(404).json({ message: "Order not found" });
+    }
+
+    existingOrder.orderStatus = status;
+
+    // Save the updated order
+    const updatedOrder = await existingOrder.save();
+
+    res.json(updatedOrder);
+  } catch (error) {
+    throw new Error(error);
+  }
+});
+
+const getTotalOrders = asyncHandler(async (req, res) => {
+  // get total of orders, sum of amount
+  try {
+    const totalOrders = await Order.aggregate([
       {
-        orderStatus: status,
-        paymentIntent: {
-          status: status,
+        $group: {
+          _id: null,
+          count: {
+            $sum: 1,
+          },
+          total: {
+            $sum: "$paymentIntent.amount",
+          },
         },
       },
-      { new: true }
-    );
-    res.json(updateOrderStatus);
+    ]);
+    res.json(totalOrders?.[0]);
   } catch (error) {
     throw new Error(error);
   }
@@ -613,4 +639,5 @@ module.exports = {
   getOrderByUserId,
   getYearlyTotalOrders,
   getMonthWiseOrderIncome,
+  getTotalOrders,
 };

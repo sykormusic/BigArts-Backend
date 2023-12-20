@@ -25,6 +25,7 @@ const {
   getOrderById,
   getYearlyTotalOrders,
   getMonthWiseOrderIncome,
+  getTotalOrders,
 } = require("../controller/userCtrl");
 const { authMiddleware, isAdmin } = require("../middlewares/authMiddleware");
 const router = express.Router();
@@ -55,7 +56,7 @@ router.get(
 );
 // router.get("/getMonthWiseOrderCount", authMiddleware, getMonthWiseOrderCount);
 router.get("/get-yearly-orders", authMiddleware, getYearlyTotalOrders);
-
+router.get("/get-total-orders", authMiddleware, getTotalOrders);
 router.get("/:id", authMiddleware, isAdmin, getaUser);
 router.delete("/empty-cart", authMiddleware, emptyCart);
 router.delete("/:id", deleteaUser);
