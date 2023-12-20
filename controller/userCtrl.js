@@ -591,25 +591,26 @@ const updateOrderStatus = asyncHandler(async (req, res) => {
 });
 
 const getTotalOrders = asyncHandler(async (req, res) => {
-  // get total of orders, sum of amount
-  try {
-    const totalOrders = await Order.aggregate([
-      {
-        $group: {
-          _id: null,
-          count: {
-            $sum: 1,
-          },
-          total: {
-            $sum: "$paymentIntent.amount",
-          },
+  // get total of orders that orderStatus= Delivered, sum of amount
+  const total = await Order.aggregate([
+    {
+      $match: {
+        orderStatus: "Delivered",
+      },
+    },
+    {
+      $group: {
+        _id: null,
+        count: {
+          $sum: 1,
+        },
+        total: {
+          $sum: "$paymentIntent.amount",
         },
       },
-    ]);
-    res.json(totalOrders?.[0]);
-  } catch (error) {
-    throw new Error(error);
-  }
+    },
+  ]);
+  res.json(total?.[0]);
 });
 
 module.exports = {
