@@ -6,8 +6,6 @@ const {
   getaUser,
   deleteaUser,
   updatedUser,
-  blockUser,
-  unblockUser,
   handleRefreshToken,
   logout,
   updatePassword,
@@ -60,7 +58,5 @@ router.put(
 );
 router.put("/edit-user", authMiddleware, updatedUser);
 router.put("/save-address", authMiddleware, saveAddress);
-router.put("/block-user/:id", authMiddleware, isAdmin, blockUser);
-router.put("/unblock-user/:id", authMiddleware, isAdmin, unblockUser);
 
 module.exports = router;

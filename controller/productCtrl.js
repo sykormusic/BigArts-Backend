@@ -1,14 +1,10 @@
 const Product = require("../models/productModel");
 const User = require("../models/userModel");
 const asyncHandler = require("express-async-handler");
-const slugify = require("slugify");
 const validateMongoDbId = require("../utils/validateMongodbId");
 
 const createProduct = asyncHandler(async (req, res) => {
   try {
-    if (req.body.title) {
-      req.body.slug = slugify(req.body.title);
-    }
     const newProduct = await Product.create(req.body);
     res.json(newProduct);
   } catch (error) {
@@ -20,9 +16,6 @@ const updateProduct = asyncHandler(async (req, res) => {
   const { id } = req.params;
   validateMongoDbId(id);
   try {
-    if (req.body.title) {
-      req.body.slug = slugify(req.body.title);
-    }
     const updateProduct = await Product.findByIdAndUpdate(id, req.body, {
       new: true,
     });

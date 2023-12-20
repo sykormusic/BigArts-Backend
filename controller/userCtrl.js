@@ -234,48 +234,6 @@ const deleteaUser = asyncHandler(async (req, res) => {
   }
 });
 
-const blockUser = asyncHandler(async (req, res) => {
-  const { id } = req.params;
-  validateMongoDbId(id);
-
-  try {
-    const blockusr = await User.findByIdAndUpdate(
-      id,
-      {
-        isBlocked: true,
-      },
-      {
-        new: true,
-      }
-    );
-    res.json(blockusr);
-  } catch (error) {
-    throw new Error(error);
-  }
-});
-
-const unblockUser = asyncHandler(async (req, res) => {
-  const { id } = req.params;
-  validateMongoDbId(id);
-
-  try {
-    const unblock = await User.findByIdAndUpdate(
-      id,
-      {
-        isBlocked: false,
-      },
-      {
-        new: true,
-      }
-    );
-    res.json({
-      message: "User UnBlocked",
-    });
-  } catch (error) {
-    throw new Error(error);
-  }
-});
-
 const updatePassword = asyncHandler(async (req, res) => {
   const { _id } = req.user;
   const { password } = req.body;
@@ -353,7 +311,6 @@ const userCart = asyncHandler(async (req, res) => {
       let object = {};
       object.product = cart[i]._id;
       object.count = cart[i].count;
-      object.color = cart[i].color;
       let getPrice = await Product.findById(cart[i]._id).select("price").exec();
       object.price = getPrice.price;
       products.push(object);
@@ -549,8 +506,6 @@ module.exports = {
   getaUser,
   deleteaUser,
   updatedUser,
-  blockUser,
-  unblockUser,
   handleRefreshToken,
   logout,
   updatePassword,
