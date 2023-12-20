@@ -23,6 +23,8 @@ const {
   updateOrderStatus,
   getAllOrders,
   getOrderById,
+  getYearlyTotalOrders,
+  getMonthWiseOrderIncome,
 } = require("../controller/userCtrl");
 const { authMiddleware, isAdmin } = require("../middlewares/authMiddleware");
 const router = express.Router();
@@ -46,6 +48,13 @@ router.get("/refresh", handleRefreshToken);
 router.get("/logout", logout);
 router.get("/wishlist", authMiddleware, getWishlist);
 router.get("/cart", authMiddleware, getUserCart);
+router.get(
+  "/get-month-wise-order-income",
+  authMiddleware,
+  getMonthWiseOrderIncome
+);
+// router.get("/getMonthWiseOrderCount", authMiddleware, getMonthWiseOrderCount);
+router.get("/get-yearly-orders", authMiddleware, getYearlyTotalOrders);
 
 router.get("/:id", authMiddleware, isAdmin, getaUser);
 router.delete("/empty-cart", authMiddleware, emptyCart);
@@ -56,6 +65,7 @@ router.put(
   isAdmin,
   updateOrderStatus
 );
+
 router.put("/edit-user", authMiddleware, updatedUser);
 router.put("/save-address", authMiddleware, saveAddress);
 
