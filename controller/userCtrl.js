@@ -30,6 +30,15 @@ const createUser = asyncHandler(async (req, res) => {
      * TODO:if user not found user create a new user
      */
     const newUser = await User.create(req.body);
+    const data = {
+      to: email,
+      text: "Hello",
+      subject: "Welcome to BigArts",
+      htm:
+        "Congratulation you have created an account on BigArts. Your email: " +
+        email,
+    };
+    sendEmail(data);
     res.json(newUser);
   } else {
     /**
@@ -255,7 +264,7 @@ const forgotPasswordToken = asyncHandler(async (req, res) => {
   try {
     const token = await user.createPasswordResetToken();
     await user.save();
-    const resetURL = `Hi, Please follow this link to reset Your Password. This link is valid till 10 minutes from now. <a href='https://bigarts.vercel.app/reset-password/${token}'>Click Here</>`;
+    const resetURL = `Hi, Please follow this link to reset Your Password. This link is valid till 10 minutes from now. <a href='http://localhost:8000/reset-password/${token}'>Click Here</>`;
     const data = {
       to: email,
       text: "Hey User",
@@ -421,6 +430,14 @@ const createOrder = asyncHandler(async (req, res) => {
       };
     });
     const updated = await Product.bulkWrite(update, {});
+    sendEmail({
+      to: user.email,
+      text: "Order Placed",
+      subject: "Order Placed",
+      htm: `Your order has been placed. Thank you for shopping with us. <br /><br />
+        <h1>Total: ${userCart.cartTotal}</h1>
+      `,
+    });
     res.json({ message: "success" });
   } catch (error) {
     throw new Error(error);
